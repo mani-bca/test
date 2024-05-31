@@ -1130,10 +1130,14 @@ grafana:
   ## Passed to grafana subchart and used by servicemonitor below
   ##
   service:
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+      service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
     type: LoadBalancer
     port: 80
     targetPort: 3000
     portName: http-web
+
 
   serviceMonitor:
     # If true, a ServiceMonitor CRD is created for a prometheus operator
