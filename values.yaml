@@ -3800,13 +3800,12 @@ prometheus:
         scheme: http
         metrics_path: '/federate'
         params:
-          'match[]':
-            - '{job="app1-aggregate"}'
-            - '{job="app2-aggregate"}'
+          'match[]': [
+            '{__name__=~"job:.*"}',]
         static_configs:
           - targets:
-            - 'http://65.0.93.197:9090'
-            - 'prom.domain2.com:9090'
+            - '65.0.93.197:9090'
+            # - 'prom.domain2.com:9090'
     
     # - job_name: kube-etcd
     #   kubernetes_sd_configs:
