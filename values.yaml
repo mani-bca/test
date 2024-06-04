@@ -3794,7 +3794,8 @@ prometheus:
     global:
       scrape_interval: 15s
       external_labels:
-      monitor: 'gateway'
+        monitor: 'gateway'
+    scrape_configs:
     - job_name: 'gateway'
       scrape_interval: 15s
       honor_labels: true
@@ -3809,7 +3810,7 @@ prometheus:
     #       - 'prometheus.cluster-1.domain.com:9090'
     #       - 'prometheus.cluster-2.domain.com:9090'
     #       - 'prometheus.cluster-3.domain.com:9090'
-    scrape_configs:
+    # scrape_configs:
     - job_name: 'app1'
     # Add usual service discovery here
       static_configs:
