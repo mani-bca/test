@@ -3793,27 +3793,20 @@ prometheus:
     additionalScrapeConfigs: []
     global:
       scrape_interval: 15s
-      external_labels:
-        monitor: 'gateway'
+    
     scrape_configs:
-    - job_name: 'prmo-fedration'
-      scrape_interval: 15s
-      honor_labels: true
-      metrics_path: '/federate'
-      params:
-        'match[]':
-          - '{job=".+"}'
-          # - '{job="app2"}'
-    #       - '{job="app3"}'
-    #   static_configs:
-    #     - targets:
-    #       - 'prometheus.cluster-1.domain.com:9090'
-    #       - 'prometheus.cluster-2.domain.com:9090'
-    #       - 'prometheus.cluster-3.domain.com:9090'
-    # - job_name: 'app1'
-    # Add usual service discovery here
-      static_configs:
-        - targets: ['65.0.93.197:9090']
+      - job_name: 'global-view'
+        honor_labels: true
+        scheme: http
+        metrics_path: '/federate'
+        params:
+          'match[]':
+            - '{job="app1-aggregate"}'
+            - '{job="app2-aggregate"}'
+        static_configs:
+          - targets:
+            - 'http://65.0.93.197:9090'
+            - 'prom.domain2.com:9090'
     
     # - job_name: kube-etcd
     #   kubernetes_sd_configs:
