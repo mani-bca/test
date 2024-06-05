@@ -1114,7 +1114,14 @@ grafana:
   ## Configure additional grafana datasources (passed through tpl)
   ## ref: http://docs.grafana.org/administration/provisioning/#datasources
   additionalDataSources: []
-  # - name: prometheus-sample
+    - name: Prometheus-standalone
+      type: prometheus
+      access: proxy
+      url: http://13.127.127.251:9090/
+      isDefault: false
+      editable: true
+      uid: prometheus-1
+  # - name: Prometheus-2
   #   access: proxy
   #   basicAuth: true
   #   basicAuthPassword: pass
@@ -3800,11 +3807,11 @@ prometheus:
         scheme: http
         metrics_path: '/federate'
         params:
-          'match[]': [
-            '{__name__=~"job:.*"}',]
+          'match[]': 
+            '{__name__=~"job:.*"}'
         static_configs:
           - targets:
-            - '65.0.93.197:9090'
+            - 'http://13.127.127.251:9090'
             # - 'prom.domain2.com:9090'
     
     # - job_name: kube-etcd

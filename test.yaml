@@ -1,0 +1,102 @@
+
+global:
+
+  scrape_interval: 60s
+ 
+scrape_configs:
+
+  - job_name: 'node_exporter'
+
+    static_configs:
+
+      - targets: [ 'dev-elk:9100', 'dev-kube-proxy:9100', 'dev-prom-grafana:9100', 'dev-postgres:9100', 'dev-bastion:9100', 'dev-rmq:9100', 'dev-hc-hc-mancenter:9100', 'dev-ops-mongodb:9100', 'dev-public-nginx:9100', 'dev-pritunl:9100', 'dev-rgpt-server-dev:9100', 'dev-sonarqube:9100', 'dev-Dev-poc:9100' ]  
+
+  - job_name: 'integrations/rabbitmq'
+
+    metrics_path: /metrics/per-object
+
+    static_configs:
+
+    - targets: ['10.60.32.217:15692']
+
+  - job_name: 'Port'
+
+    metrics_path: /probe
+
+    params:
+
+      module: [tcp_connect]
+
+    static_configs:
+
+    - targets:
+
+           - dev-elk:9200
+
+           - dev-postgres:5432
+
+           - dev-bastion:22
+
+           - dev-rmq:5672
+
+           - dev-hc-hc-mancenter:8080
+
+           - dev-ops-mongodb:27017
+
+           - dev-rgpt-server-dev:9100
+
+           - dev-sonarqube:9100
+
+           - dev-Dev-poc:9100
+
+           - dev-dev-public-nginx:9100
+
+    relabel_configs:
+
+     - source_labels: [__address__]
+
+       target_label: __param_target
+
+     - source_labels: [__param_target]
+
+       target_label: instance
+
+     - target_label: __address__
+
+       replacement: 127.0.0.1:9115
+ 
+  - job_name: 'prome-internal-federation'
+
+    scrape_timeout: 60s
+
+    scheme: http
+
+    metrics_path: /federate
+
+    params:
+
+      match[]:
+
+         - '{job=~".+"}'
+
+    honor_labels: true
+
+    static_configs:
+
+            - targets: ['ac23c2e343ad6450cb9451ad070ee301-1489955417.us-east-2.elb.amazonaws.com:9090'] ##prometheus-internal-kubestate
+ 
+rule_files:
+
+  - alert.rules.yml
+
+  - blackbox_exporter_rules.yml
+
+  - service_rules.yml
+ 
+alerting:
+
+  alertmanagers:
+
+  - static_configs:
+
+    - targets: [ '10.60.30.219:9093' ]
