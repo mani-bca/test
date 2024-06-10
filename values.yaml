@@ -1113,14 +1113,14 @@ grafana:
 
   ## Configure additional grafana datasources (passed through tpl)
   ## ref: http://docs.grafana.org/administration/provisioning/#datasources
-  additionalDataSources: []
-    - name: Prometheus-standalone
-      type: prometheus
-      access: proxy
-      url: http://13.127.127.251:9090/
-      isDefault: false
-      editable: true
-      uid: prometheus-1
+  additionalDataSources:
+  - name: Prometheus-standalone
+    type: prometheus
+    access: proxy
+    url: http://13.127.127.251:9090/
+    isDefault: false
+    editable: true
+    uid: prometheus-1
   # - name: Prometheus-2
   #   access: proxy
   #   basicAuth: true
