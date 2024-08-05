@@ -527,7 +527,7 @@ alertmanager:
 
     ## Service type
     ##
-    type: ClusterIP
+    type: NodePort
 
   ## Configuration for creating a separate Service for each statefulset Alertmanager replica
   ##
@@ -1113,8 +1113,15 @@ grafana:
 
   ## Configure additional grafana datasources (passed through tpl)
   ## ref: http://docs.grafana.org/administration/provisioning/#datasources
-  additionalDataSources: []
-  # - name: prometheus-sample
+  additionalDataSources:
+  - name: Prometheus-standalone
+    type: prometheus
+    access: proxy
+    url: http://13.127.127.251:9090/
+    isDefault: false
+    editable: true
+    uid: prometheus-1
+  # - name: Prometheus-2
   #   access: proxy
   #   basicAuth: true
   #   basicAuthPassword: pass
@@ -3791,6 +3798,7 @@ prometheus:
     ## port to 2379 and allow etcd scraping provided it is running on all Kubernetes master nodes
     ##
     additionalScrapeConfigs: []
+
     # - job_name: kube-etcd
     #   kubernetes_sd_configs:
     #     - role: node
