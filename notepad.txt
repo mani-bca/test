@@ -1,1 +1,64 @@
+GitHub Actions Workflow Documentation
 
+Overview
+
+This document outlines the GitHub Actions workflow for automating the build process when a pull request (PR) is merged into the main branch. The workflow ensures that the code is built on both ubuntu-latest and windows-latest environments.
+
+Workflow Name: dev environment workflow
+
+Trigger Event:
+
+The workflow runs when a pull request is closed and merged into the main branch.
+
+Jobs Executed:
+
+Build Job
+
+Output Job
+
+
+Workflow Breakdown
+
+1. Workflow Trigger
+
+The workflow is triggered when a pull request is closed and merged into the main branch.
+
+2. Build Job
+
+Runs on both Ubuntu and Windows environments.
+
+Uses matrix strategy to execute jobs on both OS platforms.
+
+Steps include:
+
+Checkout Code: Uses actions/checkout@v2 to pull the latest code from the repository.
+
+Set Up Python: Uses actions/setup-python@v4 to install Python version 3.x.
+
+Install Dependencies: Installs required dependencies from requirements.txt.
+
+Build Project: Runs setup.py build to compile the project.
+
+Store Build Status: Saves the build status as an environment variable (GITHUB_ENV).
+
+3. Output Job
+
+Runs only after the build job is completed.
+
+Steps include:
+
+Displaying Workflow Trigger Details: Shows the GitHub user who triggered the workflow.
+
+Logging Build Status:
+
+Displays the build result for ubuntu-latest.
+
+Displays the build result for windows-latest.
+
+Key Features
+
+Conditional Execution: The build job only runs if the pull request is merged.
+
+Matrix Strategy: Builds the application on both ubuntu-latest and windows-latest.
+
+Output Logging: Displays the build results for both OS environments.
