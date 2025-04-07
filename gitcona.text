@@ -9,3 +9,147 @@ git bisect bad
 git bisect good <older-commit-hash>
 git log --grep="search term"
 git log --graph --oneline --all
+
+
+Nice one, Manivasagan! Here's a clean breakdown with explanations, use cases, and when to use each of the Git commands you listed — perfect for building your documentation along with screenshots.
+
+✅ git add -e
+Explanation:
+Opens the staging area in your default text editor, allowing you to manually edit the patch (interactive patch staging).
+
+Use Case:
+Use this when you want granular control over what exactly gets staged, such as only some lines from a file.
+
+When to Use:
+
+During code reviews, to stage only selected changes.
+
+When you want to split a large change into smaller, logical commits.
+
+✅ git reset --soft HEAD~1
+Explanation:
+Moves HEAD and current branch pointer one commit back but keeps your changes staged.
+
+Use Case:
+Undo the last commit, but keep all changes in the staging area to revise the commit or split it.
+
+When to Use:
+
+After making a wrong commit message.
+
+When you forgot to include some changes in the last commit.
+
+✅ git fetch --all --prune
+Explanation:
+Fetches updates from all remotes and deletes local branches that no longer exist on the remote.
+
+Use Case:
+Keeps your local remote-tracking branches clean and updated.
+
+When to Use:
+
+Regular maintenance to avoid clutter.
+
+Before switching to a remote branch to make sure it's up-to-date.
+
+✅ git commit --amend
+Explanation:
+Rewrites the last commit. You can change the commit message or add/remove files.
+
+Use Case:
+Fix mistakes in your most recent commit without creating a new one.
+
+When to Use:
+
+To edit the last commit message.
+
+To add forgotten changes to the last commit.
+
+⚠️ Avoid using this after pushing unless you're okay with rewriting history.
+
+✅ git log -- <file>
+Explanation:
+Shows commit history affecting a specific file.
+
+Use Case:
+Track changes or investigate who modified a file over time.
+
+When to Use:
+
+During debugging or code history review.
+
+When doing root-cause analysis on a specific file.
+
+✅ git blame <filename>
+Explanation:
+Shows which commit and author last modified each line of a file.
+
+Use Case:
+Quickly identify who changed a specific line and in which commit.
+
+When to Use:
+
+During debugging.
+
+When reviewing legacy code.
+
+✅ git bisect start
+Explanation:
+Begins a binary search through the commit history to find a bug-introducing commit.
+
+Use Case:
+Automates the process of locating the commit that introduced a bug.
+
+When to Use:
+
+When a bug has been introduced, and you know a good and bad commit.
+
+✅ git bisect bad
+Explanation:
+Marks the current commit as bad (bug is present).
+
+Use Case:
+Used during a git bisect session to indicate that the checked commit is faulty.
+
+When to Use:
+
+Right after running the project and confirming that the bug exists in the current commit.
+
+✅ git bisect good <older-commit-hash>
+Explanation:
+Marks a known good commit. Git will now automatically checkout commits between the good and bad ones to find the first bad commit.
+
+Use Case:
+Narrow down the exact commit that introduced the bug.
+
+When to Use:
+
+At the beginning of bisecting when you know a commit where everything worked.
+
+✅ git log --grep="search term"
+Explanation:
+Searches commit messages matching a keyword.
+
+Use Case:
+Find commits based on a feature name, bug fix, or ticket number.
+
+When to Use:
+
+To track down commits by description.
+
+When searching for a previous fix or feature commit.
+
+✅ git log --graph --oneline --all
+Explanation:
+Shows a visual, simplified commit history for all branches in a tree-like structure.
+
+Use Case:
+Helps understand branching and merging history visually.
+
+When to Use:
+
+During code audits.
+
+Before merges or rebases to understand branch divergence.
+
+Would you like a table format for this as well for your documentation? Or maybe Markdown format
