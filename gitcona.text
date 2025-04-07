@@ -21,7 +21,11 @@ Use Case:
 Use this when you want granular control over what exactly gets staged, such as only some lines from a file.
 
 When to Use:
+<<<<<<< HEAD
 new dadd 
+=======
+
+>>>>>>> 1f08a12 (Update gitcona.text)
 During code reviews, to stage only selected changes.
 
 When you want to split a large change into smaller, logical commits.
@@ -34,7 +38,11 @@ Use Case:
 Undo the last commit, but keep all changes in the staging area to revise the commit or split it.
 
 When to Use:
+<<<<<<< HEAD
 let saff
+=======
+
+>>>>>>> 1f08a12 (Update gitcona.text)
 After making a wrong commit message.
 
 When you forgot to include some changes in the last commit.
