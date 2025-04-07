@@ -1,0 +1,11 @@
+git add -e
+git reset --soft HEAD~1
+git fetch --all --prune
+git commit --amend
+git log -- <file>
+git blame <filename>
+git bisect start
+git bisect bad
+git bisect good <older-commit-hash>
+git log --grep="search term"
+git log --graph --oneline --all
