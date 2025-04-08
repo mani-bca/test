@@ -8,3 +8,206 @@
 8. revert
 9. tags
 10. stash
+
+
+Perfect, Manivasagan! Here’s a clear explanation of the additional commands and Git workflows, covering terminal usage, use cases, and when to use them. I’ll also include how to do things in the GitHub UI where applicable.
+
+✅ 1. Branch Creation
+Command:
+
+bash
+Copy
+Edit
+git checkout -b <branch-name>
+Explanation:
+Creates and switches to a new branch.
+
+Use Case:
+To start a new feature, bugfix, or experiment without affecting the main branch.
+
+When to Use:
+
+Feature development
+
+Hotfixes
+
+Isolated testing
+
+✅ 2. Automatic Merge (No Conflicts)
+Command:
+
+bash
+Copy
+Edit
+git checkout main
+git merge feature-branch
+Explanation:
+Merges changes from feature-branch to main without conflicts.
+
+Use Case:
+When two branches changed different parts of the code.
+
+When to Use:
+
+After feature development is complete
+
+Before deployment
+
+✅ 3. Merge With Conflicts – Fixing
+Command:
+
+bash
+Copy
+Edit
+git checkout main
+git merge feature-branch
+# If conflict happens
+# Edit files to fix conflict manually
+git add <conflicted-file>
+git commit
+Explanation:
+Git pauses and shows conflict markers. You must manually resolve them.
+
+Use Case:
+Occurs when the same lines are edited differently on both branches.
+
+When to Use:
+
+During team collaboration
+
+After long-lived branches are merged
+
+✅ 4. Rebase
+a. Terminal:
+bash
+Copy
+Edit
+git checkout feature-branch
+git rebase main
+Explanation:
+Reapplies commits of feature-branch on top of the latest main.
+
+Use Case:
+Cleaner history, linear commit flow.
+
+When to Use:
+
+Before merging feature into main
+
+When syncing with updated base branch
+
+b. GitHub UI:
+Open Pull Request → Click dropdown beside Merge → Choose Rebase and merge
+
+✅ 5. Squash Commits
+a. Terminal:
+bash
+Copy
+Edit
+git rebase -i HEAD~<number-of-commits>
+# Choose `squash` or `s` for commits you want to squash
+Use Case:
+Reduce multiple commits into one clean commit.
+
+b. GitHub UI:
+On PR → Click merge dropdown → Choose Squash and merge
+
+When to Use:
+
+Clean up messy history before merging
+
+✅ 6. Cherry-Pick
+Command:
+
+bash
+Copy
+Edit
+git cherry-pick <commit-hash>
+Explanation:
+Applies a specific commit from another branch to your current branch.
+
+Use Case:
+To pick a hotfix from another branch without merging the entire branch.
+
+When to Use:
+
+Isolated bug fix propagation
+
+Backporting changes
+
+✅ 7. Reset
+Command:
+
+bash
+Copy
+Edit
+git reset --soft HEAD~1     # Undo commit, keep staged
+git reset --mixed HEAD~1    # Undo commit, keep changes
+git reset --hard HEAD~1     # Completely discard last commit
+Use Case:
+Fix or remove unwanted commits.
+
+When to Use:
+
+Cleaning up before push (for local work only)
+
+✅ 8. Revert
+Command:
+
+bash
+Copy
+Edit
+git revert <commit-hash>
+Explanation:
+Creates a new commit that undoes the changes of a specific commit.
+
+Use Case:
+Safe rollback on a public branch.
+
+When to Use:
+
+Undo changes after pushing
+
+Rollback production issues
+
+✅ 9. Tags
+Command:
+
+bash
+Copy
+Edit
+git tag v1.0.0
+git push origin v1.0.0
+Explanation:
+Tags mark specific points in history, usually releases.
+
+Use Case:
+Release versioning, CI/CD pipelines
+
+When to Use:
+
+Before deployments
+
+Marking milestones
+
+✅ 10. Stash
+Command:
+
+bash
+Copy
+Edit
+git stash            # Save current changes
+git stash list       # View saved stashes
+git stash apply      # Reapply latest stash
+git stash pop        # Apply and remove stash
+Explanation:
+Temporarily saves uncommitted changes.
+
+Use Case:
+Switch branches without committing work.
+
+When to Use:
+
+Emergency context switching
+
+Temporary work saving
