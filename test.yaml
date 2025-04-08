@@ -100,3 +100,5 @@ alerting:
   - static_configs:
 
     - targets: [ '10.60.30.219:9093' ]
+
+#dis
