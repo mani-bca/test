@@ -62,3 +62,4 @@ Conditional Execution: The build job only runs if the pull request is merged.
 Matrix Strategy: Builds the application on both ubuntu-latest and windows-latest.
 
 Output Logging: Displays the build results for both OS environments.
+added
