@@ -1,0 +1,10 @@
+1. the branch creations
+2. automatic merge without any conflict
+3. with conflict how to fix merge 
+4. how to rebase (using terminal how we do rebase and in the github ui how we do the rebase)
+5. squash (using terminal how we do squash commits and in the github ui how we do the squash)
+6. cherrypick
+7. reset
+8. revert
+9. tags
+10. stash
