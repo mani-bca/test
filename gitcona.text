@@ -23,7 +23,7 @@ Use this when you want granular control over what exactly gets staged, such as o
 When to Use:
 <<<<<<< HEAD
 <<<<<<< HEAD
-new dadd 
+
 =======
 
 >>>>>>> 1f08a12 (Update gitcona.text)
@@ -42,15 +42,7 @@ Use Case:
 Undo the last commit, but keep all changes in the staging area to revise the commit or split it.
 
 When to Use:
-<<<<<<< HEAD
-<<<<<<< HEAD
 let saff
-=======
-
->>>>>>> 1f08a12 (Update gitcona.text)
-=======
-
->>>>>>> parent of fb0d5c7 (third commit)
 After making a wrong commit message.
 
 When you forgot to include some changes in the last commit.
