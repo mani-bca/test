@@ -21,7 +21,7 @@ Use Case:
 Use this when you want granular control over what exactly gets staged, such as only some lines from a file.
 
 When to Use:
-
+new dadd 
 During code reviews, to stage only selected changes.
 
 When you want to split a large change into smaller, logical commits.
@@ -34,7 +34,7 @@ Use Case:
 Undo the last commit, but keep all changes in the staging area to revise the commit or split it.
 
 When to Use:
-
+let saff
 After making a wrong commit message.
 
 When you forgot to include some changes in the last commit.
