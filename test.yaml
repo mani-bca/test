@@ -102,3 +102,4 @@ alerting:
     - targets: [ '10.60.30.219:9093' ]
 
 #dis
+mansi
