@@ -377,3 +377,414 @@ kubectl exec -it test-pod -- curl database-svc.database:5432 -m 5
 4. **Multi-directional Policies**: For complete traffic control, use both ingress and egress policies together
 
 This demo provides a comprehensive overview of Kubernetes Network Policies with real examples of blocking and allowing specific traffic patterns between different application tiers. Let me know if you need any clarification or have questions about any part of the demo!
+
+##₹₹₹₹₹₹#####@######
+I'll create a simpler version of the PV/PVC, health check, namespace quota, and resource limits demo that follows the same structure as your network policy demo. This will complement your existing network policy demo without making any changes to it.
+
+## 1. NAMESPACE WITH RESOURCE QUOTA
+
+# app-namespace-quota.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: app-demo
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: app-quota
+  namespace: app-demo
+spec:
+  hard:
+    requests.cpu: "1"
+    requests.memory: 2Gi
+    limits.cpu: "2"
+    limits.memory: 4Gi
+    pods: "10"
+
+
+## 2. PERSISTENT VOLUMES & CLAIMS
+
+# app-pv-pvc.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: app-pv
+  labels:
+    type: local
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: app-pvc
+  namespace: app-demo
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi
+
+
+## 3. WEBSERVER DEPLOYMENT WITH RESOURCES AND HEALTH CHECKS
+
+# webserver-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webserver
+  namespace: app-demo
+  labels:
+    app: webserver
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: webserver
+  template:
+    metadata:
+      labels:
+        app: webserver
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:alpine
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: app-storage
+          mountPath: /usr/share/nginx/html
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: app-storage
+        persistentVolumeClaim:
+          claimName: app-pvc
+---
+# webserver-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: webserver-svc
+  namespace: app-demo
+spec:
+  selector:
+    app: webserver
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP
+
+
+## 4. API DEPLOYMENT WITH RESOURCES AND HEALTH CHECKS
+
+# api-deployment.yaml  
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: app-demo
+  labels:
+    app: api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+      - name: api
+        image: httpd:alpine
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "150m"
+          limits:
+            memory: "256Mi"
+            cpu: "300m"
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
+---
+# api-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-svc
+  namespace: app-demo
+spec:
+  selector:
+    app: api
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP
+
+
+## 5. DATABASE DEPLOYMENT WITH RESOURCES AND HEALTH CHECKS
+
+# database-deployment.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: db-pv
+  labels:
+    type: local
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/db-data"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-pvc
+  namespace: app-demo
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: database
+  namespace: app-demo
+  labels:
+    app: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: database
+  template:
+    metadata:
+      labels:
+        app: database
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:13-alpine
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_PASSWORD
+          value: "password123"
+        volumeMounts:
+        - name: db-storage
+          mountPath: /var/lib/postgresql/data
+        livenessProbe:
+          exec:
+            command: ["pg_isready", "-U", "postgres"]
+          initialDelaySeconds: 30
+          periodSeconds: 20
+        readinessProbe:
+          exec:
+            command: ["pg_isready", "-U", "postgres"]
+          initialDelaySeconds: 5
+          periodSeconds: 10
+      volumes:
+      - name: db-storage
+        persistentVolumeClaim:
+          claimName: db-pvc
+---
+# database-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-svc
+  namespace: app-demo
+spec:
+  selector:
+    app: database
+  ports:
+  - port: 5432
+    targetPort: 5432
+  type: ClusterIP
+
+## Simple Kubernetes Resources Demo Guide
+
+This demo will complement your network policy demo by adding resource management components including PVs/PVCs, health checks, namespace quotas, and CPU/memory limits.
+
+### Step 1: Create Namespace with Resource Quota
+```bash
+# Apply namespace with quota
+kubectl apply -f app-namespace-quota.yaml
+
+# Verify the quota
+kubectl get namespace app-demo
+kubectl describe namespace app-demo
+kubectl get resourcequota -n app-demo
+```
+
+### Step 2: Create Persistent Volumes and Claims
+```bash
+# Create PV and PVC for the application
+kubectl apply -f app-pv-pvc.yaml
+
+# Verify PV and PVC are created and bound
+kubectl get pv
+kubectl get pvc -n app-demo
+```
+
+### Step 3: Deploy Applications with Resource Limits and Health Checks
+```bash
+# Deploy webserver with volume, resource limits and health checks
+kubectl apply -f webserver-deployment.yaml
+kubectl apply -f webserver-service.yaml
+
+# Deploy API server with resource limits and health checks
+kubectl apply -f api-deployment.yaml
+kubectl apply -f api-service.yaml
+
+# Deploy database with volume, resource limits and health checks
+kubectl apply -f database-deployment.yaml
+kubectl apply -f database-service.yaml
+```
+
+### Step 4: Verify Deployments
+```bash
+# Check if pods are running
+kubectl get pods -n app-demo
+
+# Check resource consumption
+kubectl top pods -n app-demo
+
+# Check if services are created
+kubectl get svc -n app-demo
+```
+
+### Step 5: Test Health Checks
+```bash
+# Get the name of a webserver pod
+WEBSERVER_POD=$(kubectl get pods -n app-demo -l app=webserver -o jsonpath='{.items[0].metadata.name}')
+
+# Check the readiness and liveness probe status
+kubectl describe pod $WEBSERVER_POD -n app-demo | grep -A 10 "Liveness" 
+kubectl describe pod $WEBSERVER_POD -n app-demo | grep -A 10 "Readiness"
+
+# Simulate a failure to trigger health check
+kubectl exec -it $WEBSERVER_POD -n app-demo -- rm -rf /usr/share/nginx/html/index.html
+
+# Check pod events to see if health checks are working
+kubectl describe pod $WEBSERVER_POD -n app-demo | grep -A 15 Events:
+```
+
+### Step 6: Test Resource Limits
+```bash
+# Create a pod that exceeds the quota
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: Pod
+metadata:
+  name: large-resource-pod
+  namespace: app-demo
+spec:
+  containers:
+  - name: large-container
+    image: nginx
+    resources:
+      requests:
+        memory: "1.5Gi"
+        cpu: "800m"
+      limits:
+        memory: "2Gi"
+        cpu: "1"
+EOF
+
+# Check if quota is enforced
+kubectl get pod large-resource-pod -n app-demo
+kubectl describe pod large-resource-pod -n app-demo
+```
+
+### Step 7: Test Persistent Storage
+```bash
+# Add content to the webserver volume
+kubectl exec -it $WEBSERVER_POD -n app-demo -- sh -c "echo 'Hello from Kubernetes Volume Demo' > /usr/share/nginx/html/index.html"
+
+# Test accessing the content
+kubectl run -it --rm curl-test --image=curlimages/curl --restart=Never -n app-demo -- curl webserver-svc
+
+# Delete and recreate the pod to verify persistence
+kubectl delete pod $WEBSERVER_POD -n app-demo
+# Wait for the new pod to be created
+sleep 10
+# Get the new pod name
+NEW_WEBSERVER_POD=$(kubectl get pods -n app-demo -l app=webserver -o jsonpath='{.items[0].metadata.name}')
+# Check if the data persisted
+kubectl run -it --rm curl-test --image=curlimages/curl --restart=Never -n app-demo -- curl webserver-svc
+```
+
+## Demo Highlights
+
+1. **Namespace Resource Quota**: Controls CPU and memory consumption across the namespace
+
+2. **Persistent Volumes**: Provides storage that survives pod restarts
+   - Application HTML files stored on PV
+   - Database files stored on PV
+
+3. **Resource Management**:
+   - CPU and memory requests (guaranteed minimum)
+   - CPU and memory limits (maximum allowed)
+   - Different tiers for different workloads (DB has higher resources than web)
+
+4. **Health Checks**:
+   - Liveness probes ensure containers are restarted when unhealthy
+   - Readiness probes prevent traffic to pods that aren't ready
+   - Database uses exec-based probes, web servers use HTTP probes
+
+This demo shows how to ensure application stability and resource efficiency in Kubernetes by properly configuring storage, resource limits, and health checks.
+
+You can use this alongside your network policy demo to provide a comprehensive overview of Kubernetes security and reliability features.
+api-service.yaml
