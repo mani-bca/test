@@ -1,31 +1,33 @@
-"Today I'm presenting a custom GitHub Action I've developed that automatically lints our JavaScript code
-on pull requests. This solution integrates directly into our existing workflow and provides real-time
-feedback without requiring developers to remember to run linting locally."
+Please complete the lab exercises below and submit the same before the next session.
+
+ 
+
+Q. 1) Create Terraform config file to import existing ec2 or IAM role under terraform management.
+
+ 
+
+Q.2) Create EC2 instance with terraform with install apache or nginx (sample webpage) using remote provisioning or user data block.
+
+ 
+
+Q.3) Create/write one terraform configuration file, setup Terraform log verbosity and save logs in file named log.txt using belwo link.
+
+ 
+
+Enable logs to debug Terraform | Terraform | HashiCorp Developer
 
 
-We've all experienced PRs with inconsistent code styles or basic issues that should have been caught
-earlier. This tool ensures we maintain our coding standards by automatically checking every PR, providing
-immediate feedback to developers before reviewers need to look at the code."
+
+Q.4) Create Remote backend on AWS/GCP and store state file.
 
 
-"Our solution is a custom Docker-based GitHub Action that runs ESLint on JavaScript files changed in a
-pull request. It creates annotations directly in the GitHub interface, making issues immediately visible
-without leaving the PR view."
+Remote State Backend Configuration:
+Configure a remote state backend using an S3 bucket for storing the state file.
+Ensure the state file is versioned to keep track of changes, use S3 native option locking.
+ 
 
+Q.5) To understand and utilize different module source options, interact with module inputs and outputs, describe variable scope within modules/child modules.
 
-"The action runs in a Docker container that provides a consistent environment. Our custom script identifies
-changed files in the PR, runs ESLint on them, and converts ESLint output into GitHub annotations. The
-entire process takes seconds and integrates seamlessly with our workflow."
+1.  Module Source Options:
 
-"Let me show you the action in practice. Here's a sample PR where I've intentionally introduced some
-linting issues. You can see the action runs automatically and places annotations directly on the problematic
-lines, distinguishing between errors and warnings based on our ESLint config."
-
-"This solution provides several benefits: developers get immediate feedback without waiting for manual
-review, our code style remains consistent, and reviewers can focus on logic and architecture instead of style
-issues. And because it uses our ESLint config, it enforces the standards we've already agreed upon as a
-team.
-
-"Implementation is straightforward. We'll add the action files to our repository, create a workflow file that
-triggers on pull requests, and ensure our ESLint configuration reflects our team's standards. The action can
-be live in our repository within an hour."
+Task: write terraform configuration file to use different module source options including the public Terraform Registry, GitHub, and local paths.
