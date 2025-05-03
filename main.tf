@@ -5,6 +5,7 @@ provider "aws" {
 module "eks-cluster" {
   source             = "../../modules/eks"
   cluster_name       = var.cluster_name
+  cluster_version    = var.cluster_version
   role_name          = var.role_name
   vpc_subnets        = var.vpc_subnets
   node_group_name    = var.node_group_name

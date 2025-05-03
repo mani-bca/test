@@ -57,3 +57,7 @@ variable "access_policy_arn" {
   description = "The ARN of the access policy"
   type        = string
 }
+variable "cluster_version" {
+  description = "Kubernetes version for the EKS cluster"
+  type        = string
+}
