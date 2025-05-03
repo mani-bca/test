@@ -10,13 +10,8 @@ on:
         type: choice
         options:
           - dev
-          - staging
-      folder:
-        description: 'Folder containing Terraform code'
-        required: true
-        default: 'null'
       action:
-        description: 'Action to perform (apply or delete)'
+        description: 'Action to perform (apply, delete, plan, import)'
         required: true
         default: 'null'
         type: choice
@@ -24,42 +19,28 @@ on:
           - plan
           - apply
           - delete
-          - import
-      import_command:
-        description: 'e.g., "aws_vpc.main vpc-12345"'
-        required: false
-        default: ''
-
 env:
   AWS_REGION: us-east-1
   TF_VERSION: '1.10.1'
   TF_VAR_environment: ${{ github.event.inputs.environment }}
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
-  terraform-plan:
-    name: Terraform Plan
-    if: ${{ github.event.inputs.action == 'plan' }}
+  infra-provision:
+    name: Infra Provision
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ${{ github.event.inputs.folder }}
-    
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Configure AWS Credentials
+      - name: Configure AWS Credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
-
-      - name: Setup SSH Key
-        run: |
-          echo "${{ secrets.EC2_SSH_KEY }}" > devops.pem
-          chmod 400 devops.pem
-          echo "TF_VAR_private_key_path=$(pwd)/devops.pem" >> $GITHUB_ENV
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -67,171 +48,29 @@ jobs:
           terraform_version: ${{ env.TF_VERSION }}
 
       - name: Terraform Init
-        id: init
         run: terraform init
 
-      - name: Run Terraform with Logging
+      - name: Terraform Validate
+        if: ${{ github.event.inputs.action != 'plan' }}
+        run: terraform validate
+
+      - name: Terraform Plan
+        if: ${{ github.event.inputs.action == 'plan' }}
         run: |
           export TF_LOG=DEBUG
           export TF_LOG_PATH=$(pwd)/log.txt
           terraform plan
-      # - name: Terraform Apply
-      #   run: terraform plan
 
-      - name: Upload Terraform logs
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: terraform-logs-${{ github.event.inputs.environment }}-plan
-          path: ${{ github.event.inputs.folder }}/log.txt
-          retention-days: 30
-
-  terraform-apply:
-    name: Terraform Apply
-    if: ${{ github.event.inputs.action == 'apply' }}
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ${{ github.event.inputs.folder }}
-    
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Setup SSH Key
-        run: |
-          echo "${{ secrets.EC2_SSH_KEY }}" > devops.pem
-          chmod 400 devops.pem
-          echo "TF_VAR_private_key_path=$(pwd)/devops.pem" >> $GITHUB_ENV
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: ${{ env.TF_VERSION }}
-
-      - name: Terraform Init
-        id: init
-        run: terraform init
-
-      - name: Terraform Validate
-        id: validate
-        run: terraform validate
-
-      - name: Run Terraform with Logging
+      - name: Terraform Apply
+        if: ${{ github.event.inputs.action == 'apply' }}
         run: |
           export TF_LOG=DEBUG
           export TF_LOG_PATH=$(pwd)/log.txt
           terraform apply -auto-approve
 
-      # - name: Terraform Apply
-      #   run: terraform apply -auto-approve
-
-      - name: Upload Terraform logs
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: terraform-logs-${{ github.event.inputs.environment }}-apply
-          path: ${{ github.event.inputs.folder }}/log.txt
-          retention-days: 30
-
-  terraform-delete:
-    name: Terraform Delete
-    if: ${{ github.event.inputs.action == 'delete' }}
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ${{ github.event.inputs.folder }}
-    
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: ${{ env.TF_VERSION }}
-
-      - name: Terraform Init
-        id: init
-        run: terraform init
-
-      - name: Terraform Validate
-        id: validate
-        run: terraform validate
-
-      - name: Run Terraform with Logging
+      - name: Terraform Delete
+        if: ${{ github.event.inputs.action == 'delete' }}
         run: |
           export TF_LOG=DEBUG
           export TF_LOG_PATH=$(pwd)/log.txt
           terraform destroy -auto-approve
-
-      # - name: Terraform Destroy
-      #   run: terraform destroy -auto-approve
-
-      - name: Upload Terraform logs
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: terraform-logs-${{ github.event.inputs.environment }}-destroy
-          path: ${{ github.event.inputs.folder }}/log.txt
-          retention-days: 30
-
-  terraform-import:
-    name: Terraform Import
-    if: ${{ github.event.inputs.action == 'import' }}
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ${{ github.event.inputs.folder }}
-    
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: ${{ env.TF_VERSION }}
-
-      - name: Terraform Init
-        id: init
-        run: terraform init
-
-      - name: Terraform Validate
-        id: validate
-        run: terraform validate
-
-      - name: Run Terraform Import with Logging
-        run: |
-          export TF_LOG=DEBUG
-          export TF_LOG_PATH=$(pwd)/log.txt
-          terraform import ${{ github.event.inputs.import_command }}
-
-      - name: Upload Terraform logs
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: terraform-logs-${{ github.event.inputs.environment }}-import
-          path: ${{ github.event.inputs.folder }}/log.txt
-          retention-days: 30
