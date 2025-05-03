@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: demo-ingress-app
+  namespace: demo-apps
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - path: /netflix
+        pathType: Prefix
+        backend:
+          service:
+            name: netflix-app
+            port:
+              number: 80
+      - path: /ekart
+        pathType: Prefix
+        backend:
+          service:
+            name: ekart-app
+            port:
+              number: 80
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: netflix-app
+            port:
+              number: 80

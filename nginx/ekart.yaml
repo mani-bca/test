@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ekart-app
+  namespace: demo-apps
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ekart-app
+  template:
+    metadata:
+      labels:
+        app: ekart-app
+    spec:
+      containers:
+      - name: ekart-app
+        image: manidevops2021/ekart:7.0
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ekart-app
+  namespace: demo-apps
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: ekart-app
