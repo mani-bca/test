@@ -508,12 +508,6 @@ alertmanager:
   config:
     global:
       resolve_timeout: 5m
-      smtp_smarthost: 'smtp.gmail.com:587'
-      smtp_from: 'manidevops2021@gmail.com'
-      smtp_auth_username: 'manidevops2021@gmail.com'
-      smtp_auth_password: 'icuo plgf ixkl kmth'
-      smtp_require_tls: true
-
     inhibit_rules:
       - source_matchers:
           - 'severity = critical'
@@ -537,7 +531,6 @@ alertmanager:
           - 'namespace'
       - target_matchers:
           - 'alertname = InfoInhibitor'
-
     route:
       group_by: ['namespace']
       group_wait: 30s
@@ -545,22 +538,13 @@ alertmanager:
       repeat_interval: 12h
       receiver: 'null'
       routes:
-        - receiver: 'null'
-          matchers:
-            - alertname = "Watchdog"
-        - receiver: 'email-notification'
-          matchers:
-            - severity = "critical"
-
+      - receiver: 'null'
+        matchers:
+          - alertname = "Watchdog"
     receivers:
-      - name: 'SRE TEAM'
-      - name: 'email-notification'
-        email_configs:
-          - to: 'manivasagan.p@hcltech.com'
-            send_resolved: true
-
+    - name: 'null'
     templates:
-      - '/etc/alertmanager/config/*.tmpl'
+    - '/etc/alertmanager/config/*.tmpl'
 
   ## Alertmanager configuration directives (as string type, preferred over the config hash map)
   ## stringConfig will be used only, if tplConfig is true
@@ -1260,7 +1244,7 @@ grafana:
   defaultDashboardsInterval: 1m
 
   adminUser: admin
-  adminPassword: mani-admin
+  adminPassword: prom-operator
 
   rbac:
     ## If true, Grafana PSPs will be created
@@ -1274,6 +1258,39 @@ grafana:
     labels: {}
     path: /
     pathType: Prefix
+
+    ## IngressClassName for Grafana Ingress.
+    ## Should be provided if Ingress is enable.
+    ##
+    # ingressClassName: nginx
+
+    ## Annotations for Grafana Ingress
+    ##
+    # annotations: {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+
+    ## Labels to be added to the Ingress
+    ##
+    # labels: {}
+
+    ## Hostnames.
+    ## Must be provided if Ingress is enable.
+    ##
+    # hosts:
+    #   - grafana.domain.com
+    hosts: []
+
+    ## Path for grafana ingress
+    # path: /
+
+    ## TLS configuration for grafana Ingress
+    ## Secret must be manually created in the namespace
+    ##
+    tls: []
+    # - secretName: grafana-general-tls
+    #   hosts:
+    #   - grafana.example.com
 
   # # To make Grafana persistent (Using Statefulset)
   # #
