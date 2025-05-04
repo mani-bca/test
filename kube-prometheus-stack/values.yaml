@@ -1252,6 +1252,13 @@ grafana:
   ##
   defaultDashboardsInterval: 1m
 
+  dashboards:
+    default:
+      node-monitor:
+        gnetId: 10028
+        revision: 1
+        datasource: Prometheus
+
   adminUser: admin
   adminPassword: mani-sane
 
