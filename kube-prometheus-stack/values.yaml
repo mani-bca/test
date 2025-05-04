@@ -508,6 +508,11 @@ alertmanager:
   config:
     global:
       resolve_timeout: 5m
+      smtp_smarthost: 'smtp.gmail.com:587'
+      smtp_from: 'manidevops2021@gmail.com'
+      smtp_auth_username: 'manidevops2021@gmail.com'
+      smtp_auth_password: 'icuo plgf ixkl kmth'
+      smtp_require_tls: true
     inhibit_rules:
       - source_matchers:
           - 'severity = critical'
@@ -542,7 +547,11 @@ alertmanager:
         matchers:
           - alertname = "Watchdog"
     receivers:
-    - name: 'null'
+    - name: 'SRE TEAM'
+    - name: 'email-notification'
+      email_configs:
+        - to: 'manivasagan.p@hcltech.com'
+          send_resolved: true
     templates:
     - '/etc/alertmanager/config/*.tmpl'
 
@@ -1244,7 +1253,7 @@ grafana:
   defaultDashboardsInterval: 1m
 
   adminUser: admin
-  adminPassword: prom-operator
+  adminPassword: mani-sane
 
   rbac:
     ## If true, Grafana PSPs will be created
@@ -1252,12 +1261,9 @@ grafana:
     pspEnabled: false
 
   ingress:
-    enabled: true
-    ingressClassName: nginx
-    annotations: {}
-    labels: {}
-    path: /
-    pathType: Prefix
+    ## If true, Grafana Ingress will be created
+    ##
+    enabled: false
 
     ## IngressClassName for Grafana Ingress.
     ## Should be provided if Ingress is enable.
@@ -1266,13 +1272,13 @@ grafana:
 
     ## Annotations for Grafana Ingress
     ##
-    # annotations: {}
+    annotations: {}
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
 
     ## Labels to be added to the Ingress
     ##
-    # labels: {}
+    labels: {}
 
     ## Hostnames.
     ## Must be provided if Ingress is enable.
@@ -1282,7 +1288,7 @@ grafana:
     hosts: []
 
     ## Path for grafana ingress
-    # path: /
+    path: /
 
     ## TLS configuration for grafana Ingress
     ## Secret must be manually created in the namespace
@@ -1415,6 +1421,8 @@ grafana:
     portName: http-web
     ipFamilies: []
     ipFamilyPolicy: ""
+    type: NodePort
+    nodePort: 30080 
 
   serviceMonitor:
     # If true, a ServiceMonitor CRD is created for a prometheus operator
@@ -3512,7 +3520,7 @@ prometheus:
 
     ## Service type
     ##
-    type: ClusterIP
+    type: NodePort
 
     ## Additional ports to open for Prometheus service
     ##
